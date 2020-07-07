@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from library.models import Category, Genre, Title
-
+from library.models import Category, Genre, Title, Review, Comment
+from users.models import User
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,3 +38,34 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category',)
         model = Title
+
+
+class SendConfirmationCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+
+class CheckConfirmationCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    confirmation_code = serializers.CharField(required=True)
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('first_name', 'last_name', 'username', 'bio', 'email', 'role',)
+        model = User
+
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'score', 'pub_date',)
+        model = Review
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'pub_date',)
+        model = Comment
