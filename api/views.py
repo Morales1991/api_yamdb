@@ -9,7 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 
 from library.models import Category, Genre, Title, Review, Comment
 from .serializers import TitleSerializer, CategorySerializer, GenreSerializer, ReviewSerializer, CommentSerializer
-from .permissions import IsAdminOrReadOnly, IsAuthorOrAdminOrModerator
+from .permissions import IsAdminOrReadOnly, IsAdminOrModOrAuthor
 from .filters import TitlesFilter
 
 
@@ -53,7 +53,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthorOrAdminOrModerator]
+    permission_classes = [IsAdminOrModOrAuthor]
     pagination_class = PageNumberPagination
 
     def perform_create(self, serializer):
@@ -74,13 +74,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title.save(update_fields=['rating'])
 
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs['title_id'])
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         return Review.objects.filter(title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthorOrAdminOrModerator,)
+    permission_classes = [IsAdminOrModOrAuthor]
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
