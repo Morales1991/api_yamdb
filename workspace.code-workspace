@@ -1,0 +1,34 @@
+{
+	"folders": [
+		{
+			"path": "../../final_project/yamdb/api"
+		},
+		{
+			"path": "../../final_project/yamdb/api_yamdb"
+		},
+		{
+			"path": "../../final_project/yamdb/data"
+		},
+		{
+			"path": "../../final_project/yamdb/static"
+		},
+		{
+			"path": "../../final_project/yamdb/templates"
+		},
+		{
+			"path": "../../final_project/yamdb/tests"
+		},
+		{
+			"path": "../../final_project/yamdb/venv"
+		},
+		{
+			"path": "../../final_project/yamdb/users/migrations"
+		},
+		{
+			"path": "../../final_project/yamdb/users"
+		}
+	],
+	"settings": {
+		"python.pythonPath": "/home/vlad/Рабочий стол/final_project/yamdb/venv/bin/python"
+	}
+}
