@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Category(models.Model):
@@ -22,18 +23,7 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-    scores = (
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-        (5, 5),
-        (6, 6),
-        (7, 7),
-        (8, 8),
-        (9, 9),
-        (10, 10)
-    )
+    score = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
     text = models.TextField()
     title = models.ForeignKey(Title, on_delete=models.CASCADE, related_name='reviews')
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
