@@ -16,8 +16,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from library.models import Category, Genre, Title, Review, Comment
-from .serializers import TitleSerializer, CategorySerializer, GenreSerializer, ReviewSerializer, CommentSerializer, \
-    UserSerializer
+from .serializers import (TitleSerializer, CategorySerializer, GenreSerializer, ReviewSerializer, CommentSerializer,
+                          UserSerializer)
 from .permissions import IsAdminOrReadOnly, IsAdminOrModOrAuthor, IsAdmin
 from .filters import TitlesFilter
 

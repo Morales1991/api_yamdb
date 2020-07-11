@@ -19,7 +19,9 @@ class Title(models.Model):
     description = models.CharField(max_length=1000, blank=True)
     rating = models.IntegerField(blank=True, null=True)
     genre = models.ManyToManyField(Genre, verbose_name='Жанр')
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Категория')
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Категория'
+    )
 
 
 class Review(models.Model):
