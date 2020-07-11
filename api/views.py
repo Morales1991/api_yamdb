@@ -13,7 +13,6 @@ from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from library.models import Category, Genre, Title, Review, Comment
 from .serializers import (TitleSerializer, CategorySerializer, GenreSerializer, ReviewSerializer, CommentSerializer,
@@ -25,26 +24,13 @@ from .filters import TitlesFilter
 User = get_user_model()
 
 
-def get_tokens_for_user(user):
-    refresh = RefreshToken.for_user(user)
-    token = str(refresh.access_token)
-    return token
-
-
-class UserList(generics.ListCreateAPIView):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['username']
     permission_classes = (permissions.IsAuthenticated, IsAdmin)
-
-
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated, IsAdmin)
-    lookup_field = 'username'
     ordering = ['id']
+    lookup_field = 'username'
 
 
 class MyProfile(generics.RetrieveUpdateAPIView):
@@ -63,12 +49,13 @@ class GetToken(APIView):
         confirmation_code = request.data.get('confirmation_code')
 
         try:
-            user = User.objects.filter(email=email, confirmation_code=confirmation_code).exists()
+            user = User.objects.get(email=email, confirmation_code=confirmation_code)
             user.is_active = True
-            return Response(f'Ваш токен: {get_tokens_for_user(user)}')
+            user.save()
+            return Response({'token': user.get_token()})
 
         except User.DoesNotExist:
-            return Response('Пользователь не найден или код подтверждения не верный')
+            return Response({'token': 'Пользователя с такими данными не существует'})
 
 
 class RegistrationView(APIView):
@@ -81,8 +68,8 @@ class RegistrationView(APIView):
             email = serializer.data.get('email')
             username = serializer.data.get('username')
             confirmation_code = secrets.token_hex(9)
-            User.objects.create_user(
-                email=email, username=username, confirmation_code=confirmation_code
+            User.objects.update_or_create(
+                email=email, username=username, confirmation_code=confirmation_code #разве по умолчанию  is_active = False?
             )
 
             send_mail(
