@@ -1,10 +1,12 @@
 from rest_framework import permissions
 
+from users.models import User
+
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.is_authenticated:
-            return request.user.is_staff or request.user.role == 'admin'
+            return request.user.is_staff or request.user.role == User.UserRoles.ADMIN
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -12,7 +14,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         if request.user.is_authenticated:
-            return request.user.is_staff or request.user.role == 'admin'
+            return request.user.is_staff or request.user.role == User.UserRoles.ADMIN
 
 
 class IsOwnerOrReadOnly(permissions.IsAuthenticatedOrReadOnly):
@@ -25,8 +27,8 @@ class IsAdminOrModOrAuthor(permissions.IsAuthenticatedOrReadOnly):
         is_staff_or_owner = (
                 request.user.is_authenticated and (
                 request.user.is_staff or
-                request.user.role == 'admin' or
-                request.user.role == 'moderator' or
+                request.user.role == User.UserRoles.ADMIN or
+                request.user.role == User.UserRoles.MODERATOR or
                 obj.author == request.user
         ))
 
