@@ -69,7 +69,7 @@ class RegistrationView(APIView):
             username = serializer.data.get('username')
             confirmation_code = secrets.token_hex(9)
             User.objects.update_or_create(
-                email=email, username=username, confirmation_code=confirmation_code #разве по умолчанию  is_active = False?
+                email=email, username=username, confirmation_code=confirmation_code #разве по умолчанию  не идет is_active = False?
             )
 
             send_mail(

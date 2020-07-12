@@ -6,21 +6,6 @@ from django.contrib.auth.models import (
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-class MyUserManager(BaseUserManager):
-    def create_superuser(self, email, date_of_birth, password=None):
-        if not email:
-            raise ValueError('Users must have an email address')
-        
-        user = self.create_user(
-            email=email,
-            password=password,
-            date_of_birth=date_of_birth,
-        )
-        user.is_admin = True
-        user.save(using=self._db)
-        return user
-
-
 class User(AbstractUser):
     class UserRoles:
         USER = 'user'
@@ -38,10 +23,10 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     confirmation_code = models.CharField(max_length=9)
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
-def get_tokens(self):
-    refresh = RefreshToken.for_user(self)
-    token = str(refresh.access_token)
-    return token
+    def get_tokens(self):
+        refresh = RefreshToken.for_user(self)
+        token = str(refresh.access_token)
+        return token
