@@ -1,8 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from .views import (TitleViewSet, CategoryViewSet, GenreViewSet, ReviewViewSet, CommentViewSet, GetToken,
-                    RegistrationView, MyProfile, UserViewSet
+from .views import (
+    TitleViewSet, CategoryViewSet, GenreViewSet, ReviewViewSet,
+    CommentViewSet, GetToken, RegistrationView, MyProfile, UserViewSet
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 

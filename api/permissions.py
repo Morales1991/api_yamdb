@@ -15,6 +15,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
             return True
         if request.user.is_authenticated:
             return request.user.is_staff or request.user.role == User.UserRoles.ADMIN
+        return False
 
 
 class IsOwnerOrReadOnly(permissions.IsAuthenticatedOrReadOnly):

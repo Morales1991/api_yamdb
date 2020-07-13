@@ -1,7 +1,6 @@
 import secrets
 
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -55,7 +54,10 @@ class GetToken(APIView):
             return Response({'token': user.get_token()})
 
         except User.DoesNotExist:
-            return Response({'token': 'Пользователя с такими данными не существует'})
+            return Response(
+                data={'detail': 'Пользователя с такими данными не существует'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class RegistrationView(APIView):
@@ -69,7 +71,8 @@ class RegistrationView(APIView):
             username = serializer.data.get('username')
             confirmation_code = secrets.token_hex(9)
             User.objects.update_or_create(
-                email=email, username=username, confirmation_code=confirmation_code #разве по умолчанию  не идет is_active = False?
+                defaults={'confirmation_code': confirmation_code},
+                email=email, username=username
             )
 
             send_mail(
@@ -79,7 +82,8 @@ class RegistrationView(APIView):
                 [str(email)],
                 fail_silently=False,
             )
-            return Response('Код подтверждения выслан вам на почту', status=status.HTTP_201_CREATED)
+            return Response({'details': 'Код подтверждения выслан вам на почту'},
+                status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -122,7 +126,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitlesFilter
 
-
+    
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [IsAdminOrModOrAuthor]
@@ -134,16 +138,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
             raise ValidationError('Вы уже поставили оценку')
 
         serializer.save(author=self.request.user, title=title)
-        agg_score = Review.objects.filter(title=title).aggregate(Avg('score'))
-        title.rating = agg_score['score__avg']
-        title.save(update_fields=['rating'])
+        title.update_rating()
 
     def perform_update(self, serializer):
         serializer.save()
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        agg_score = Review.objects.filter(title=title).aggregate(Avg('score'))
-        title.rating = agg_score['score__avg']
-        title.save(update_fields=['rating'])
+        title.update_rating()
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))

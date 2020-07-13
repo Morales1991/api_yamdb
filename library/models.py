@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Avg
 
 
 class Category(models.Model):
@@ -22,6 +23,10 @@ class Title(models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Категория'
     )
+
+    def update_rating(self):
+        self.rating = self.reviews.all().aggregate(Avg('score'))['score__avg'] 
+        self.save()
 
 
 class Review(models.Model):
